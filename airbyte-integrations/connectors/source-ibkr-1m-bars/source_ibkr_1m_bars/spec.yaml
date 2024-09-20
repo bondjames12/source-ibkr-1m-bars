@@ -1,0 +1,65 @@
+documentationUrl: https://www.colinweber.com
+connectionSpecification:
+  $schema: http://json-schema.org/draft-07/schema#
+  title: Ibkr 1m Bars Spec
+  type: object
+  required:
+    - host
+    - port
+    - clientid
+    - symbol
+    - exchange
+    - currency
+  properties:
+    # 'TODO: This schema defines the configuration required for the source. This usually involves metadata such as database and/or authentication information.':
+    host:
+      type: string
+      title: Host
+      description: IP or hostname of IBKR TWS API or IB Gateway API
+    port:
+      type: integer
+      title: Port
+      description: Port TWS or IB Gateway is listening on
+      examples:
+        - 4000
+    clientid:
+      type: integer
+      title: ClientID
+      description: Unique ID for each API client
+    timeout:
+      type: number
+      title: Timeout
+      description: How long to try connect before giving up
+    readonly:
+      type: boolean
+      title: ReadOnly
+      description: Set to True when API is in read-only mode.
+    symbol:
+      type: string
+      title: Symbol
+      description: "Instrument symbol Eg: QQQ"
+      examples:
+        - QQQ
+        - TSLA
+        - KO
+    exchange:
+      type: string
+      title: Exchange
+      description: "Exchange code Eg: SMART"
+      examples:
+        - SMART
+    currency:
+      type: string
+      title: Currency
+      description: "Currency code Eg: USD"
+      examples:
+        - USD
+        - CAD
+    startdate:
+      type: string
+      title: "Start Date"
+      description: "Currency code Eg: USD"
+      pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      pattern_descriptor: "YYYY-MM-DD"
+      examples:
+        - "2020-12-28"

@@ -1,0 +1,34 @@
+data:
+  allowedHosts:
+    hosts:
+      - TODO # Please change to the hostname of the source.
+  registries:
+    oss:
+      enabled: true
+    cloud:
+      enabled: false
+  remoteRegistries:
+    pypi:
+      enabled: true
+      packageName: airbyte-source-ibkr-1m-bars
+  connectorBuildOptions:
+    # Please update to the latest version of the connector base image.
+    # https://hub.docker.com/r/airbyte/python-connector-base
+    # Please use the full address with sha256 hash to guarantee build reproducibility.
+    baseImage: docker.io/airbyte/python-connector-base:1.2.0@sha256:c22a9d97464b69d6ef01898edf3f8612dc11614f05a84984451dde195f337db9
+  connectorSubtype: api
+  connectorType: source
+  definitionId: 6f7c174c-ea94-4909-90c0-96986a4881a2
+  dockerImageTag: 0.1.0
+  dockerRepository: airbyte/source-ibkr-1m-bars
+  githubIssueLabel: source-ibkr-1m-bars
+  icon: ibkr-1m-bars.svg
+  license: MIT
+  name: Ibkr 1m Bars
+  releaseDate: TODO
+  supportLevel: community
+  releaseStage: alpha
+  documentationUrl: https://docs.airbyte.com/integrations/sources/ibkr-1m-bars
+  tags:
+    - language:python
+metadataSpecVersion: "1.0"
