@@ -34,8 +34,7 @@ class Bars(BarSteam):
     def __init__(self, config: Mapping[str, Any]):
         super().__init__()
         self.config = config
-        # Now you can access config values within the class using self.config, e.g.,
-        # self.config["host"]
+        
 
     def get_updated_state(self, current_stream_state: MutableMapping[str, Any], latest_record: Mapping[str, Any]) -> Mapping[str, Any]:
         """
@@ -57,20 +56,23 @@ class Bars(BarSteam):
             latest_record_date = datetime.strptime(latest_record_date, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=timezone.utc)
 
         if latest_record_date and (not current_state or latest_record_date > current_state):
-            return {self.cursor_field: latest_record_date}
+            current_stream_state[self.cursor_field] = latest_record_date
         return current_stream_state
 
     def read_records(self, stream_state: Mapping[str, Any] = None, **kwargs) -> Iterable[Mapping[str, Any]]:
         stream_state = stream_state or {}
+        logger.info(f"stream_state: {stream_state}")
         ib = IB()
         ib.connect(self.config["host"], self.config["port"], self.config["clientid"])
         symbol = self.config["symbol"]
         start_date = self._get_start_date(stream_state)
         logger.info(f"Start Date: {start_date}")
-        end_date = datetime.now(timezone.utc)
-        logger.info(f"End Date: {end_date}")
+        end_date = stream_state.get("end", datetime.now(timezone.utc))
+        if end_date and type(end_date) is str:
+            end_date = datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=timezone.utc)
+            stream_state.pop('end', None)
+        logger.info(f"End Date_: {end_date}")
         contract = Stock(symbol, self.config["exchange"], self.config["currency"])
-        barsList = []
         while start_date < end_date:
             bars = ib.reqHistoricalData(
                 contract,
@@ -84,7 +86,6 @@ class Bars(BarSteam):
             logger.info(f"Got: {bars.__len__()} bars from IBKR API")
             if not bars:
                 break
-            barsList.append(bars)
             end_date = bars[0].date
             logger.info(f"Got date until: " + str(end_date))
 
@@ -103,7 +104,8 @@ class Bars(BarSteam):
                 }
                 yield bar_as_dict
                 # Update the state with the latest record's date
-                stream_state[self.cursor_field] = bar_as_dict['date']    
+                #just set end_date
+                stream_state[self.cursor_field] = end_date
         ib.disconnect()
 
         
