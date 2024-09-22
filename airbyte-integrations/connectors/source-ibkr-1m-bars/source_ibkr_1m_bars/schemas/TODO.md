@@ -1,30 +1,23 @@
-# TODO: Define your stream schemas
+#Test check
+poetry run source-ibkr-1m-bars check --config secrets/config.json
 
-Your connector must describe the schema of each stream it can output using [JSONSchema](https://json-schema.org).
+#Test read
+poetry run source-ibkr-1m-bars read --config secrets/config.json --catalog integration_tests/configured_catalog.json
 
-The simplest way to do this is to describe the schema of your streams using one `.json` file per stream. You can also dynamically generate the schema of your stream in code, or you can combine both approaches: start with a `.json` file and dynamically add properties to it.
+#build docker image
+docker build . -t airbyte/source-ibkr-1m-bars:dev
 
-The schema of a stream is the return value of `Stream.get_json_schema`.
+#Tag image
+docker tag airbyte/source-ibkr-1m-bars:dev vps03.colinweber.com/airbyte/source-ibkr-1m-bars:dev
 
-## Static schemas
+#push to my container registry
+docker push vps03.colinweber.com/airbyte/source-ibkr-1m-bars:dev
 
-By default, `Stream.get_json_schema` reads a `.json` file in the `schemas/` directory whose name is equal to the value of the `Stream.name` property. In turn `Stream.name` by default returns the name of the class in snake case. Therefore, if you have a class `class EmployeeBenefits(HttpStream)` the default behavior will look for a file called `schemas/employee_benefits.json`. You can override any of these behaviors as you need.
 
-Important note: any objects referenced via `$ref` should be placed in the `shared/` directory in their own `.json` files.
+#change stream state manually in connector GUI to 
+ "streamState": {
+      "date": "2000-01-01T18:49:00+00:00",
+      "end": "2017-08-01T18:49:00+00:00"
+}
 
-## Dynamic schemas
-
-If you'd rather define your schema in code, override `Stream.get_json_schema` in your stream class to return a `dict` describing the schema using [JSONSchema](https://json-schema.org).
-
-## Dynamically modifying static schemas
-
-Override `Stream.get_json_schema` to run the default behavior, edit the returned value, then return the edited value:
-
-```
-def get_json_schema(self):
-    schema = super().get_json_schema()
-    schema['dynamically_determined_property'] = "property"
-    return schema
-```
-
-Delete this file once you're done. Or don't. Up to you :)
+#end is the ending date range, date is the beginning of the range.
