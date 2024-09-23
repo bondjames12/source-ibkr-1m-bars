@@ -71,6 +71,7 @@ class Bars(BarSteam):
         if end_date and type(end_date) is str:
             end_date = datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=timezone.utc)
             stream_state.pop('end', None)
+        readHighestDate = end_date
         logger.info(f"End Date_: {end_date}")
         contract = Stock(symbol, self.config["exchange"], self.config["currency"])
         while start_date < end_date:
@@ -106,6 +107,7 @@ class Bars(BarSteam):
                 # Update the state with the latest record's date
                 #just set end_date
                 stream_state[self.cursor_field] = end_date
+        stream_state[self.cursor_field] = readHighestDate
         ib.disconnect()
 
         
