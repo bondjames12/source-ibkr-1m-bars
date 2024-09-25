@@ -49,11 +49,17 @@ class Bars(BarSteam):
         #logger.info(f"current_state: {current_state}")
         if current_state and type(current_state) is str:
             # Parse the last synced date from the state
-            current_state = datetime.strptime(current_state, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=timezone.utc)
+            try:
+                current_state = datetime.strptime(current_state, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=timezone.utc)
+            except ValueError:
+                current_state = datetime.strptime(current_state, '%Y-%m-%dT%H:%M:%S.%f%z').replace(tzinfo=timezone.utc)
         #logger.info(f"latest_record_date: {latest_record_date}")
         if latest_record_date and type(latest_record_date) is str:
             # Parse the last synced date from the state
-            latest_record_date = datetime.strptime(latest_record_date, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=timezone.utc)
+            try:
+                latest_record_date = datetime.strptime(latest_record_date, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=timezone.utc)
+            except ValueError:
+                latest_record_date = datetime.strptime(latest_record_date, '%Y-%m-%dT%H:%M:%S.%f%z').replace(tzinfo=timezone.utc)
 
         if latest_record_date and (not current_state or latest_record_date > current_state):
             current_stream_state[self.cursor_field] = latest_record_date
@@ -69,7 +75,10 @@ class Bars(BarSteam):
         logger.info(f"Start Date: {start_date}")
         end_date = stream_state.get("end", datetime.now(timezone.utc))
         if end_date and type(end_date) is str:
-            end_date = datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=timezone.utc)
+            try:
+                end_date = datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=timezone.utc)
+            except ValueError:
+                end_date = datetime.strptime(end_date, '%Y-%m-%dT%H:%M:%S.%f%z').replace(tzinfo=timezone.utc)
             stream_state.pop('end', None)
         readHighestDate = end_date
         logger.info(f"End Date_: {end_date}")
@@ -120,13 +129,16 @@ class Bars(BarSteam):
         user_start_date = self.config.get('startdate')
         logger.info(f"Config Start Date: {user_start_date}")
         if user_start_date:
-            start_date = datetime.strptime(user_start_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+                start_date = datetime.strptime(user_start_date, '%Y-%m-%d').replace(tzinfo=timezone.utc)
         # If there's existing state, use the last synced date
         last_synced_str = stream_state.get(self.cursor_field)
         logger.info(f"Stream Start Start Date: {last_synced_str}")
         if last_synced_str:
             # Parse the last synced date from the state
-            last_synced_date = datetime.strptime(last_synced_str, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=timezone.utc)
+            try:
+                last_synced_date = datetime.strptime(last_synced_str, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=timezone.utc)
+            except ValueError:
+                last_synced_date = datetime.strptime(last_synced_str, '%Y-%m-%dT%H:%M:%S.%f%z').replace(tzinfo=timezone.utc)
             # Use the max of user_start_date and last_synced_date
             return max(start_date, last_synced_date)
         else:
